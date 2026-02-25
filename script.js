@@ -291,32 +291,56 @@ function confirmarSeleccion() {
     CONFIG.datosEvaluacion.minTime = picData.minTime;
     CONFIG.datosEvaluacion.maxTime = picData.maxTime;
     
+    // Ocultar imágenes no seleccionadas
     document.querySelectorAll('.picture-card').forEach((card, index) => {
         if (index + 1 !== selectedPictureNum) {
             card.classList.add('hidden');
         }
     });
     
+    // Ocultar botón de confirmación
     document.getElementById('btn-confirm').classList.remove('active');
     
+    // Mensaje del usuario en chat
     const selectionMsg = `I selected Picture ${selectedPictureNum} (Level ${picData.level})`;
     addMessageToChat('user', selectionMsg);
     
+    // Confirmación de MiaTech
     const confirmation = MESSAGES.confirmSelection
         .replace('{nombre}', CONFIG.datosEvaluacion.firstName)
         .replace('{num}', selectedPictureNum)
         .replace('{level}', picData.level);
     
     addMessageToChat('assistant', confirmation);
+    updateCurrentResponse(confirmation);
     speakText(confirmation);
     
-    CONFIG.pasoActual = 2;
-    document.getElementById('recording-controls').style.display = 'flex';
-    document.getElementById('mic-button').disabled = false;
-    document.getElementById('transcription-container').style.display = 'block';
+    // Calcular tiempo del mensaje de confirmación
+    const palabras = confirmation.split(' ').length;
+    const tiempoEstimado = palabras * 500;
     
-    document.getElementById('timer-required').textContent = 
-        `Required: ${picData.minTime}-${picData.maxTime} min`;
+    // Mostrar controles DESPUÉS de que MiaTech termine de hablar
+    setTimeout(() => {
+        CONFIG.pasoActual = 2;
+        
+        // Ocultar contenedor de imágenes
+        document.getElementById('pictures-container').style.display = 'none';
+        
+        // Mostrar información de la imagen seleccionada en current-response
+        const taskInfo = `Selected: Picture ${selectedPictureNum} (Level ${picData.level})\n\n${picData.task}`;
+        updateCurrentResponse(taskInfo);
+        
+        // Mostrar controles de grabación
+        document.getElementById('recording-controls').style.display = 'flex';
+        document.getElementById('mic-button').disabled = false;
+        document.getElementById('transcription-container').style.display = 'block';
+        
+        // Actualizar temporizador
+        document.getElementById('timer-required').textContent = 
+            `Required: ${picData.minTime}-${picData.maxTime} min`;
+        
+        console.log('🎤 Recording controls enabled');
+    }, tiempoEstimado);
 }
 
 // ==========================================

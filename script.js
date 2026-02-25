@@ -59,7 +59,7 @@ const MESSAGES = {
 
 // 1.4 - Configuración global
 const CONFIG = {
-    apiKey: 'AIzaSyDqEoih6hk3tIvqUpxsSS7CyAMhvTXWsRE', // ⚠️ AGREGAR TU API KEY DE GEMINI AQUÍ
+    apiKey: '', // ⚠️ AGREGAR TU API KEY DE GEMINI AQUÍ
     currentLanguage: 'en',
     isRecording: false,
     isSpeaking: false,

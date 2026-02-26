@@ -39,7 +39,7 @@
                     <input type="text" 
                            class="form-input" 
                            id="student-lastname"
-                           placeholder="e.g., Smith"
+                           placeholder="e.g., Doe"
                            required>
                     <div class="form-error" id="error-lastname">Please enter your last name</div>
                 </div>
@@ -91,42 +91,9 @@
                 <h1 class="logo">Mi<span class="logo-accent">@</span>Tech</h1>
                 <p class="subtitle">English Assessment System</p>
                 
-                <!-- BOTONES DE ACCIÓN -->
-                <div class="status-buttons-container">
-                    <button class="action-button btn-start" id="btn-start" onclick="iniciarEvaluacion()">
-                        ▶️ Start Assessment
-                    </button>
-                </div>
-            </div>
-
-            <div>
-                <!-- CONTROLES DE GRABACIÓN (centrados) -->
-                <div class="recording-controls" id="recording-controls" style="display: block;">
-                    <button class="mic-button" id="mic-button" onclick="toggleRecording()" disabled>
-                        <div id="mic-icon">
-                            <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                                <line x1="12" y1="19" x2="12" y2="23"/>
-                                <line x1="8" y1="23" x2="16" y2="23"/>
-                            </svg>
-                        </div>
-                    </button>
-                    
-                    <div class="timer-display" id="timer-display">
-                        <div class="timer-current" id="timer-current">00:00</div>
-                        <div class="timer-required" id="timer-required">Required: 2-3 min</div>
-                    </div>
-                </div>
-
-                <!-- SPINNER -->
-                <div class="spinner-container" id="spinner-container">
-                    <div class="spinner"></div>
-                    <p class="spinner-text" id="spinner-text">Processing...</p>
-                </div>
-
             </div>
         </div>
+
 
 
         <!-- GRID PRINCIPAL -->
@@ -134,6 +101,17 @@
             
             <!-- COLUMNA IZQUIERDA: AVATAR -->
             <div class="avatar-column">
+                                <!-- BOTONES DE ACCIÓN -->
+                <div class="status-buttons-container">
+                    <button class="action-button btn-start" id="btn-start" onclick="iniciarEvaluacion()">
+                        ▶️ Start Assessment
+                    </button>
+                                    <!-- SPINNER -->
+                <div class="spinner-container" id="spinner-container">
+                    <div class="spinner"></div>
+                    <p class="spinner-text" id="spinner-text">Processing...</p>
+                </div>
+                </div>
                 <div class="avatar-container" id="avatar-container">
                     <div class="avatar-glow"></div>
                     <!-- Avatar único (GIF que cambia entre estático y animado) -->
@@ -147,7 +125,46 @@
             </div>
 
             <!-- COLUMNA DERECHA: CONVERSACIÓN -->
-            <div class="conversation-column">
+            <div class="conversation-column" >
+            
+                <div class="recording-panel" id="recording-panel" style="display:block;">
+                    <!-- CONTROLES DE GRABACIÓN (centrados) -->
+                    <div>
+                        <div class="recording-controls" id="recording-controls">
+                            <button class="mic-button" id="mic-button" onclick="toggleRecording()" disabled>
+                                <div id="mic-icon">
+                                    <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="23"/>
+                                        <line x1="8" y1="23" x2="16" y2="23"/>
+                                    </svg>
+                                </div>
+                            </button>
+                            
+                            <div class="timer-display" id="timer-display">
+                                <div class="timer-current" id="timer-current">00:00</div>
+                                <div class="timer-required" id="timer-required">Required: 2-3 min</div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    
+                    <!-- ÁREA DE TRANSCRIPCIÓN EN TIEMPO REAL -->
+                    <div class="transcription-container" id="transcription-container" style="display: none;">
+                        <div class="transcription-title">📝 Live Transcription</div>
+                        <div class="transcription-text" id="transcription-text" class="transcription-empty">
+                            Start speaking to see your transcription here...
+                        </div>
+                        <div class="submit-container">
+                            <button class="btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
+                                📤 Submit Response
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
                 
                 <!-- HISTORIAL DE CHAT -->
                 <div class="chat-history" id="chat-history">
@@ -170,18 +187,6 @@
                     </button>
                 </div>
                 
-                <!-- ÁREA DE TRANSCRIPCIÓN EN TIEMPO REAL -->
-                <div class="transcription-container" id="transcription-container" style="display: none;">
-                    <div class="transcription-title">📝 Live Transcription</div>
-                    <div class="transcription-text" id="transcription-text" class="transcription-empty">
-                        Start speaking to see your transcription here...
-                    </div>
-                    <div class="submit-container">
-                        <button class="btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
-                            📤 Submit Response
-                        </button>
-                    </div>
-                </div>
 
                 <!-- RESPUESTA ACTUAL (CALIFICACIÓN) -->
                 <div class="current-response">

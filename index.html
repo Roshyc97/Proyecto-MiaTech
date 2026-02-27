@@ -129,8 +129,8 @@
             
                 <div class="recording-panel" id="recording-panel" style="display:block;">
                     <!-- CONTROLES DE GRABACIÓN (centrados) -->
-                    <div>
-                        <div class="recording-controls" id="recording-controls">
+                    <div class="recording-controls" id="recording-controls" style="display: block;">
+                        <div>
                             <button class="mic-button" id="mic-button" onclick="toggleRecording()" disabled>
                                 <div id="mic-icon">
                                     <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
@@ -141,14 +141,11 @@
                                     </svg>
                                 </div>
                             </button>
-                            
-                            <div class="timer-display" id="timer-display">
-                                <div class="timer-current" id="timer-current">00:00</div>
-                                <div class="timer-required" id="timer-required">Required: 2-3 min</div>
-                            </div>
                         </div>
-
-
+                        <div class="timer-display" id="timer-display">
+                            <div class="timer-current" id="timer-current">00:00</div>
+                            <div class="timer-required" id="timer-required">Required: 2-3 min</div>
+                        </div>
                     </div>
                     
                     <!-- ÁREA DE TRANSCRIPCIÓN EN TIEMPO REAL -->
@@ -158,12 +155,11 @@
                             Start speaking to see your transcription here...
                         </div>
                         <div class="submit-container">
-                            <button class="btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
+                            <button class="action-button btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
                                 📤 Submit Response
                             </button>
                         </div>
                     </div>
-
                 </div>
                 
                 <!-- HISTORIAL DE CHAT -->

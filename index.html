@@ -93,25 +93,24 @@
                 
             </div>
         </div>
-
-
+        
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="status-buttons-container">
+            <button class="action-button btn-start" id="btn-start" onclick="iniciarEvaluacion()">
+                ▶️ Start Assessment
+            </button>
+            <!-- SPINNER -->
+            <div class="spinner-container" id="spinner-container">
+                <div class="spinner"></div>
+                <p class="spinner-text" id="spinner-text">Processing...</p>
+            </div>
+        </div>
 
         <!-- GRID PRINCIPAL -->
         <div class="conversation-grid">
-            
             <!-- COLUMNA IZQUIERDA: AVATAR -->
             <div class="avatar-column">
-                                <!-- BOTONES DE ACCIÓN -->
-                <div class="status-buttons-container">
-                    <button class="action-button btn-start" id="btn-start" onclick="iniciarEvaluacion()">
-                        ▶️ Start Assessment
-                    </button>
-                                    <!-- SPINNER -->
-                <div class="spinner-container" id="spinner-container">
-                    <div class="spinner"></div>
-                    <p class="spinner-text" id="spinner-text">Processing...</p>
-                </div>
-                </div>
+
                 <div class="avatar-container" id="avatar-container">
                     <div class="avatar-glow"></div>
                     <!-- Avatar único (GIF que cambia entre estático y animado) -->
@@ -127,7 +126,7 @@
             <!-- COLUMNA DERECHA: CONVERSACIÓN -->
             <div class="conversation-column" >
             
-                <div class="recording-panel" id="recording-panel" style="display:block;">
+                <div class="recording-panel" id="recording-panel" style="display:grid;">
                     <!-- CONTROLES DE GRABACIÓN (centrados) -->
                     <div class="recording-controls" id="recording-controls" style="display: block;">
                         <div>
@@ -141,10 +140,11 @@
                                     </svg>
                                 </div>
                             </button>
+                           <div class="timer-current" id="timer-current">00:00
+                           </div>
                         </div>
                         <div class="timer-display" id="timer-display">
-                            <div class="timer-current" id="timer-current">00:00</div>
-                            <div class="timer-required" id="timer-required">Required: 2-3 min</div>
+                             <div class="timer-required" id="timer-required">Required: 2-3 min</div>
                         </div>
                     </div>
                     

@@ -59,7 +59,7 @@ const MESSAGES = {
 
 // 1.4 - Configuración global
 const CONFIG = {
-    apiKey: '', // ⚠️ AGREGAR TU API KEY DE GEMINI AQUÍ
+    apiKey: 'AIzaSyDqEoih6hk3tIvqUpxsSS7CyAMhvTXWsRE', // ⚠️ AGREGAR TU API KEY DE GEMINI AQUÍ
     currentLanguage: 'en',
     isRecording: false,
     isSpeaking: false,
@@ -145,34 +145,73 @@ function requestMicrophonePermission() {
 // ==========================================
 
 function generatePictureCards() {
-    const grid = document.getElementById('pictures-grid');
+    // Mostrar el primer tab por defecto
+    showTab(1);
+}
+
+let currentTabNum = 1;
+let selectedPictureNum = null;
+
+function showTab(num) {
+    currentTabNum = num;
     
-    Object.keys(PICTURES_DATA).forEach((key, index) => {
-        const pic = PICTURES_DATA[key];
-        const num = index + 1;
+    // Actualizar tabs visuales
+    for (let i = 1; i <= 4; i++) {
+        const tab = document.getElementById(`tab-${i}`);
+        if (i === num) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    }
+    
+    // Obtener datos de la imagen
+    const pictureKey = `picture${num}`;
+    const picData = PICTURES_DATA[pictureKey];
+    
+    // Generar contenido del tab
+    const tabContent = document.getElementById('tab-content');
+    tabContent.innerHTML = `
+        <div class="tab-content-header">
+            Level ${picData.level} - ${getLevelName(picData.level)}
+        </div>
         
-        const card = document.createElement('div');
-        card.className = 'picture-card';
-        card.id = `picture-card-${num}`;
-        card.onclick = () => selectPicture(num);
+        <div class="tab-content-task">
+            <strong>Task:</strong> ${picData.task}
+        </div>
         
-        card.innerHTML = `
-            <div class="picture-header">
-                <div class="picture-level">Level: ${pic.level}</div>
-                <div class="picture-duration">Duration: ${pic.minTime}-${pic.maxTime} min</div>
-            </div>
-            <div class="picture-task">${pic.task}</div>
-            <div class="picture-radio">
-                <input type="radio" name="picture" id="radio-${num}" value="${num}">
-                <label for="radio-${num}">Select this picture</label>
-            </div>
-            <div class="picture-image-container">
-                <img src="${pic.imageUrl}" alt="Picture ${num}" class="picture-image">
-            </div>
-        `;
+        <div class="tab-content-image">
+            <img src="${picData.imageUrl}" alt="Picture ${num} - Level ${picData.level}">
+        </div>
         
-        grid.appendChild(card);
-    });
+        <div class="tab-content-selection">
+            <input type="radio" 
+                   name="picture-selection" 
+                   id="radio-tab-${num}" 
+                   value="${num}"
+                   onchange="selectTabPicture(${num})"
+                   ${selectedPictureNum === num ? 'checked' : ''}>
+            <label for="radio-tab-${num}">Select this picture</label>
+        </div>
+    `;
+    
+    console.log(`📸 Showing tab ${num}: Level ${picData.level}`);
+}
+
+function getLevelName(level) {
+    const names = {
+        'A1': 'Beginner',
+        'A2.1': 'Elementary',
+        'A2.2': 'Pre-Intermediate',
+        'B1': 'Intermediate'
+    };
+    return names[level] || '';
+}
+
+function selectTabPicture(num) {
+    selectedPictureNum = num;
+    document.getElementById('btn-confirm').style.display = 'block';
+    console.log(`✓ Picture ${num} selected`);
 }
 
 // ==========================================
@@ -257,25 +296,6 @@ function iniciarEvaluacionReal() {
 // SECCIÓN 5: SELECCIÓN DE IMAGEN
 // ==========================================
 
-let selectedPictureNum = null;
-
-function selectPicture(num) {
-    selectedPictureNum = num;
-    
-    document.querySelectorAll('.picture-card').forEach((card, index) => {
-        if (index + 1 === num) {
-            card.classList.add('selected');
-            card.classList.remove('dimmed');
-            document.getElementById(`radio-${num}`).checked = true;
-        } else {
-            card.classList.remove('selected');
-            card.classList.add('dimmed');
-        }
-    });
-    
-    document.getElementById('btn-confirm').classList.add('active');
-}
-
 function confirmarSeleccion() {
     if (!selectedPictureNum) {
         alert('Please select a picture first');
@@ -291,15 +311,8 @@ function confirmarSeleccion() {
     CONFIG.datosEvaluacion.minTime = picData.minTime;
     CONFIG.datosEvaluacion.maxTime = picData.maxTime;
     
-    // Ocultar imágenes no seleccionadas
-    document.querySelectorAll('.picture-card').forEach((card, index) => {
-        if (index + 1 !== selectedPictureNum) {
-            card.classList.add('hidden');
-        }
-    });
-    
     // Ocultar botón de confirmación
-    document.getElementById('btn-confirm').classList.remove('active');
+    document.getElementById('btn-confirm').style.display = 'none';
     
     // Mensaje del usuario en chat
     const selectionMsg = `I selected Picture ${selectedPictureNum} (Level ${picData.level})`;
@@ -326,9 +339,8 @@ function confirmarSeleccion() {
         // Ocultar contenedor de imágenes
         document.getElementById('pictures-container').style.display = 'none';
         
-        // Mostrar información de la imagen seleccionada en current-response
-        const taskInfo = `Selected: Picture ${selectedPictureNum} (Level ${picData.level})\n\n${picData.task}`;
-        updateCurrentResponse(taskInfo);
+        // Mostrar la imagen y tarea en current-response
+        mostrarImagenYTarea(selectedPictureNum, picData);
         
         // Mostrar controles de grabación
         document.getElementById('recording-controls').style.display = 'flex';
@@ -342,6 +354,41 @@ function confirmarSeleccion() {
         console.log('🎤 Recording controls enabled');
     }, tiempoEstimado);
 }
+
+function mostrarImagenYTarea(num, picData) {
+    const responseElement = document.getElementById('current-response-text');
+    
+    // Crear HTML con imagen y tarea
+    const contenidoHTML = `
+        <div style="text-align: center;">
+            <h3 style="color: #764ba2; margin-bottom: 15px;">
+                📸 Picture ${num} - Level ${picData.level}
+            </h3>
+            
+            <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #764ba2;">
+                <strong>Task:</strong> ${picData.task}
+            </div>
+            
+            <div style="max-width: 500px; margin: 0 auto; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                <img src="${picData.imageUrl}" 
+                     alt="Picture ${num}" 
+                     style="width: 100%; height: auto; display: block;">
+            </div>
+            
+            <p style="margin-top: 20px; color: #666; font-style: italic;">
+                Keep this picture visible while you record your response
+            </p>
+        </div>
+    `;
+    
+    // IMPORTANTE: Como current-response-text es un <p>, 
+    // necesitamos usar el contenedor padre
+    const responseContainer = document.querySelector('.current-response');
+    responseContainer.innerHTML = contenidoHTML;
+    
+    console.log('✅ Image and task displayed');
+}
+
 
 // ==========================================
 // SECCIÓN 6: SISTEMA DE VOZ
@@ -814,7 +861,8 @@ function mostrarCalificacionFinal(calificacion) {
     respuestaFinal += MESSAGES.farewell;
     
     addMessageToChat('assistant', respuestaFinal);
-    updateCurrentResponse(respuestaFinal);
+    const responseContainer = document.querySelector('.current-response');
+    responseContainer.innerHTML = `<p class="current-response-text" id="current-response-text">${respuestaFinal}</p>`;
     speakText(respuestaFinal);
     
     setTimeout(() => {

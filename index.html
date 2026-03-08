@@ -39,7 +39,7 @@
                     <input type="text" 
                            class="form-input" 
                            id="student-lastname"
-                           placeholder="e.g., Smith"
+                           placeholder="e.g., Doe"
                            required>
                     <div class="form-error" id="error-lastname">Please enter your last name</div>
                 </div>
@@ -87,99 +87,77 @@
         
         <!-- HEADER -->
         <div class="header-container">
-            <div>
                 <h1 class="logo">Mi<span class="logo-accent">@</span>Tech</h1>
                 <p class="subtitle">English Assessment System</p>
-                
-                <!-- BOTONES DE ACCIÓN -->
-                <div class="status-buttons-container">
-                    <button class="action-button btn-start" id="btn-start" onclick="iniciarEvaluacion()">
-                        ▶️ Start Assessment
-                    </button>
-                </div>
-            </div>
-
-            <div>
-                <!-- CONTROLES DE GRABACIÓN (centrados) -->
-                <div class="recording-controls" id="recording-controls" style="display: block;">
-                    <button class="mic-button" id="mic-button" onclick="toggleRecording()" disabled>
-                        <div id="mic-icon">
-                            <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                                <line x1="12" y1="19" x2="12" y2="23"/>
-                                <line x1="8" y1="23" x2="16" y2="23"/>
-                            </svg>
-                        </div>
-                    </button>
-                    
-                    <div class="timer-display" id="timer-display">
-                        <div class="timer-current" id="timer-current">00:00</div>
-                        <div class="timer-required" id="timer-required">Required: 2-3 min</div>
-                    </div>
-                </div>
-
-                <!-- SPINNER -->
-                <div class="spinner-container" id="spinner-container">
-                    <div class="spinner"></div>
-                    <p class="spinner-text" id="spinner-text">Processing...</p>
-                </div>
-
+        </div>
+        
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="status-buttons-container">
+            <button class="action-button btn-start" id="btn-start" onclick="iniciarEvaluacion()">
+                ▶️ Start Assessment
+            </button>
+            <!-- SPINNER -->
+            <div class="spinner-container" id="spinner-container">
+                <div class="spinner"></div>
+                <p class="spinner-text" id="spinner-text">Processing...</p>
             </div>
         </div>
 
-
         <!-- GRID PRINCIPAL -->
         <div class="conversation-grid">
-            
             <!-- COLUMNA IZQUIERDA: AVATAR -->
             <div class="avatar-column">
+
                 <div class="avatar-container" id="avatar-container">
                     <div class="avatar-glow"></div>
                     <!-- Avatar único (GIF que cambia entre estático y animado) -->
                     <img src="img/miaTech_of.png" 
                         id="miatech-gif" 
                         data-static="img/miaTech_of.png"
-                        data-animated="img/miaTech_of.png" 
+                        data-animated="img/MiaTechv.gif" 
                         alt="MiaTech Avatar"
-                        class="avatar-image miatech-gif">
+                        class="avatar-image">
                 </div>
             </div>
 
             <!-- COLUMNA DERECHA: CONVERSACIÓN -->
-            <div class="conversation-column">
-                
-                <!-- HISTORIAL DE CHAT -->
-                <div class="chat-history" id="chat-history">
-                    <div class="chat-history-title">💬 Conversation</div>
-                    <div class="chat-empty" id="chat-empty">
-                        Press "Start Assessment" to begin 🎤
-                    </div>
-                </div>
+            <div class="conversation-column" >
+            
+                <div class="recording-panel" id="recording-panel">
+                    <!-- CONTROLES DE GRABACIÓN (centrados) -->
+                    <div class="recording-controls" id="recording-controls" style="display: none;">
+                        <div>
+                            <button class="mic-button" id="mic-button" onclick="toggleRecording()" disabled>
+                                <div id="mic-icon">
+                                    <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="23"/>
+                                        <line x1="8" y1="23" x2="16" y2="23"/>
+                                    </svg>
+                                </div>
+                            </button>
+                            <div class="timer-current" id="timer-current">00:00
+                            </div>
+                            <div class="timer-display" id="timer-display">
+                                <div class="timer-required" id="timer-required">Required: 2-3 min</div>
+                            </div>
 
-                                <!-- SELECCIÓN DE IMÁGENES -->
-                <div class="pictures-container" id="pictures-container" style="display: none;">
-                    <h3 class="pictures-title">📸 Select a Picture for Your Assessment</h3>
-                    
-                    <!-- Las 4 tarjetas de imágenes se generarán dinámicamente con JavaScript -->
-                    <div id="pictures-grid"></div>
-                    
-                    <!-- Botón de confirmación -->
-                    <button class="action-button btn-confirm" id="btn-confirm" onclick="confirmarSeleccion()">
-                        ✓ Confirm Selection
-                    </button>
-                </div>
-                
-                <!-- ÁREA DE TRANSCRIPCIÓN EN TIEMPO REAL -->
-                <div class="transcription-container" id="transcription-container" style="display: none;">
-                    <div class="transcription-title">📝 Live Transcription</div>
-                    <div class="transcription-text" id="transcription-text" class="transcription-empty">
-                        Start speaking to see your transcription here...
+                        </div>
+                        
                     </div>
-                    <div class="submit-container">
-                        <button class="btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
-                            📤 Submit Response
-                        </button>
+                    
+                    <!-- ÁREA DE TRANSCRIPCIÓN EN TIEMPO REAL -->
+                    <div class="transcription-container" id="transcription-container" style="display: none;">
+                        <div class="transcription-title">📝 Live Transcription</div>
+                        <div class="transcription-text" id="transcription-text" class="transcription-empty">
+                            Start speaking to see your transcription here...
+                        </div>
+                        <div class="submit-container">
+                            <button class="action-button btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
+                                📤 Submit Response
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -189,6 +167,52 @@
                         Hello! I'm MiaTech. Press "Start Assessment" to begin your English assessment.
                     </p>
                 </div>
+
+                <!-- SELECCIÓN DE IMÁGENES -->
+                <div class="pictures-container" id="pictures-container" style="display: none;">
+                    <h3 class="pictures-title">📸 Select a Picture for Your Assessment</h3>
+                    
+                    <!-- Tabs de niveles -->
+                    <div class="tabs-container">
+                        <div class="tab active" id="tab-1" onclick="showTab(1)">
+                            <div class="tab-level">A1</div>
+                            <div class="tab-duration">2-3 min</div>
+                        </div>
+                        <div class="tab" id="tab-2" onclick="showTab(2)">
+                            <div class="tab-level">A2.1</div>
+                            <div class="tab-duration">2-4 min</div>
+                        </div>
+                        <div class="tab" id="tab-3" onclick="showTab(3)">
+                            <div class="tab-level">A2.2</div>
+                            <div class="tab-duration">3-5 min</div>
+                        </div>
+                        <div class="tab" id="tab-4" onclick="showTab(4)">
+                            <div class="tab-level">B1</div>
+                            <div class="tab-duration">3-5 min</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenido del tab activo -->
+                    <div class="tab-content" id="tab-content">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </div>
+                    
+                    <!-- Botón de confirmación -->
+                    <button class="action-button btn-confirm" id="btn-confirm" onclick="confirmarSeleccion()" style="display: none;">
+                        ✓ Confirm Selection
+                    </button>
+                </div>
+
+                                <!-- HISTORIAL DE CHAT -->
+                <div class="chat-history" id="chat-history">
+                    <div class="chat-history-title">💬 Conversation</div>
+                    <div class="chat-empty" id="chat-empty">
+                        Press "Start Assessment" to begin 🎤
+                    </div>
+                </div>
+                
+
+
             </div>
         </div>
 

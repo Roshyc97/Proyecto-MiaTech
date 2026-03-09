@@ -67,16 +67,16 @@
     <div class="modal-overlay" id="modal-error">
         <div class="modal-content">
             <div class="modal-title">⚠️ Unable to generate grade</div>
-            <div class="modal-text">
-                Download your conversation and contact your teacher.<br><br>
-                Do you want to restart the assessment?
+            <div class="modal-text" id="modal-error-text">
+                The automatic grading failed after 3 attempts.<br><br>
+                You can try again manually or download your conversation.
             </div>
             <div class="modal-buttons">
-                <button class="modal-btn modal-btn-primary" onclick="reiniciarEvaluacion()">
-                    Yes, Restart
-                </button>
                 <button class="modal-btn modal-btn-secondary" onclick="descargarSinCalificacion()">
-                    No, Download without grade
+                    📥 Download without grade
+                </button>
+                <button class="modal-btn modal-btn-secondary" onclick="reiniciarEvaluacion()">
+                    🔁 Restart Assessment
                 </button>
             </div>
         </div>
@@ -156,6 +156,9 @@
                         <div class="submit-container">
                             <button class="action-button btn-submit" id="btn-submit" onclick="enviarRespuesta()" disabled>
                                 📤 Submit Response
+                            </button>
+                            <button class="action-button btn-retry" id="btn-retry" onclick="reintentarCalificacion()" style="display: none;">
+                                🔄 Retry Grading
                             </button>
                         </div>
                     </div>

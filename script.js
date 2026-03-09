@@ -114,7 +114,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     setTimeout(loadVoices, 1000);
     
-    requestMicrophonePermission();
     generatePictureCards();
     
     CONFIG.datosEvaluacion.fechaInicio = new Date().toISOString();
@@ -127,16 +126,20 @@ function loadVoices() {
     }
 }
 
-function requestMicrophonePermission() {
+async function requestMicrophonePermission() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(() => {
-                console.log('✅ Microphone permissions granted');
-            })
-            .catch((err) => {
-                console.error('❌ Permissions denied:', err);
-                alert('Please allow microphone access to perform the assessment.');
-            });
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            console.log('✅ Microphone permissions granted');
+            return true;
+        } catch (err) {
+            console.error('❌ Permissions denied:', err);
+            alert('⚠️ Microphone access is required for this assessment.\n\nPlease allow microphone permissions and try again.');
+            return false;
+        }
+    } else {
+        alert('⚠️ Your browser does not support microphone access.\n\nPlease use Chrome or Edge.');
+        return false;
     }
 }
 
@@ -266,9 +269,11 @@ function submitStudentForm(event) {
     iniciarEvaluacionReal();
 }
 
-function iniciarEvaluacionReal() {
+async function iniciarEvaluacionReal() {
     CONFIG.evaluacionIniciada = true;
     CONFIG.pasoActual = 1;
+    
+    console.log('✅ Permissions granted - continuing with assessment');
     
     document.getElementById('btn-start').disabled = true;
     document.getElementById('btn-start').textContent = '⏳ Assessment in progress...';
@@ -280,11 +285,8 @@ function iniciarEvaluacionReal() {
     speakText(greeting);
     
     // Mostrar selección de imágenes DESPUÉS de que termine de hablar
-    const utterance = CONFIG.synthesis.getUtterances ? CONFIG.synthesis.getUtterances()[0] : null;
-    
-    // Calcular tiempo aproximado del saludo (palabras × 0.5 segundos)
     const palabras = greeting.split(' ').length;
-    const tiempoEstimado = palabras * 500; // 500ms por palabra aproximadamente
+    const tiempoEstimado = palabras * 500;
     
     setTimeout(() => {
         document.getElementById('pictures-container').style.display = 'block';
@@ -568,10 +570,6 @@ function startRecording() {
     }
     
     startTimer();
-    
-    setTimeout(() => {
-        document.getElementById('btn-submit').disabled = false;
-    }, 2000);
 }
 
 function stopRecording() {
@@ -603,6 +601,18 @@ function stopRecording() {
     `;
     
     stopTimer();
+
+    // Habilitar botón de envío SOLO después de detener grabación
+    const submitBtn = document.getElementById('btn-submit');
+    
+    // Verificar si hay transcripción
+    if (CONFIG.datosEvaluacion.fullTranscription.trim().length > 0) {
+        submitBtn.disabled = false;
+        console.log('✅ Submit button enabled - transcription available');
+    } else {
+        submitBtn.disabled = true;
+        console.log('⚠️ Submit button disabled - no transcription');
+    }
 }
 
 // ==========================================
@@ -691,9 +701,16 @@ async function generarCalificacionConReintentos() {
         }
     }
     
+    // Todos los intentos automáticos fallaron
     hideSpinner();
     console.log('❌ All 3 automatic attempts failed');
-    mostrarModalError();
+    
+    // Mostrar botón de Retry en vez de modal
+    document.getElementById('btn-retry').style.display = 'inline-block';
+    document.getElementById('btn-retry').disabled = false;
+    
+    // Actualizar current-response con mensaje de error
+    updateCurrentResponse('⚠️ Unable to generate grade automatically.\n\nPlease use the "Retry Grading" button to try again manually.');
 }
 
 async function generarCalificacionCompleta() {
@@ -871,7 +888,85 @@ function mostrarCalificacionFinal(calificacion) {
 }
 
 function mostrarModalError() {
-    document.getElementById('modal-error').classList.add('active');
+    const modal = document.getElementById('modal-error');
+    const modalText = document.getElementById('modal-error-text');
+    
+    // Calcular total de intentos realizados
+    const totalIntentos = CONFIG.maxIntentosAutomaticos + CONFIG.reintentosManual;
+    
+    console.log(`📊 Showing final error modal - All ${totalIntentos} attempts exhausted`);
+    
+    // Mensaje final cuando se agotaron TODOS los intentos
+    modalText.innerHTML = `
+        <strong style="color: #dc3545;">All retry attempts have been exhausted.</strong><br><br>
+        <strong>${CONFIG.reintentosManual} manual</strong> attempts failed.<br><br>
+        Please download your conversation and contact your teacher for manual evaluation.
+    `;
+    
+    modal.classList.add('active');
+}
+
+async function reintentarCalificacion() {
+    // Verificar si aún hay reintentos disponibles
+    if (CONFIG.reintentosManual >= CONFIG.maxReintentosManual) {
+        console.log('❌ No manual retries remaining');
+        
+        // Mostrar modal de error final
+        mostrarModalError();
+        return;
+    }
+    
+    CONFIG.reintentosManual++;
+    console.log(`🔄 Manual retry ${CONFIG.reintentosManual} of ${CONFIG.maxReintentosManual}`);
+    
+    // Deshabilitar botón de retry mientras se procesa
+    document.getElementById('btn-retry').disabled = true;
+    
+    // Mostrar spinner
+    showSpinner(`Retrying grading (Manual attempt ${CONFIG.reintentosManual} of ${CONFIG.maxReintentosManual})...`);
+    
+    // Esperar un momento antes de reintentar
+    await esperar(1000);
+    
+    // Intentar calificar de nuevo
+    const calificacion = await generarCalificacionCompleta();
+    
+    if (calificacion) {
+        // Éxito
+        hideSpinner();
+        console.log(`✅ Manual retry ${CONFIG.reintentosManual} succeeded!`);
+        
+        // Ocultar botón de retry
+        document.getElementById('btn-retry').style.display = 'none';
+        
+        // Mostrar calificación
+        mostrarCalificacionFinal(calificacion);
+    } else {
+        // Falló
+        hideSpinner();
+        console.log(`❌ Manual retry ${CONFIG.reintentosManual} failed`);
+        
+        // Calcular reintentos restantes
+        const reintentosRestantes = CONFIG.maxReintentosManual - CONFIG.reintentosManual;
+        
+        if (reintentosRestantes > 0) {
+            // Aún hay reintentos, habilitar botón de nuevo
+            console.log(`⚠️ ${reintentosRestantes} manual retries remaining`);
+            document.getElementById('btn-retry').disabled = false;
+            
+            // Actualizar mensaje
+            updateCurrentResponse(`⚠️ Manual retry ${CONFIG.reintentosManual} failed.\n\nYou have ${reintentosRestantes} ${reintentosRestantes === 1 ? 'retry' : 'retries'} remaining.\n\nClick "Retry Grading" to try again.`);
+        } else {
+            // Se agotaron todos los reintentos
+            console.log('❌ All manual retries exhausted');
+            
+            // Ocultar botón de retry
+            document.getElementById('btn-retry').style.display = 'none';
+            
+            // Mostrar modal de error final
+            mostrarModalError();
+        }
+    }
 }
 
 function esperar(ms) {

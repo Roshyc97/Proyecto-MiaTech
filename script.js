@@ -1192,4 +1192,5 @@ function iniciarEvaluacion() {
 
 function reiniciarEvaluacion() {
     location.reload();
+
 }

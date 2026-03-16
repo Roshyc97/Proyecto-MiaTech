@@ -59,7 +59,7 @@ const MESSAGES = {
 
 // 1.4 - Configuración global
 const CONFIG = {
-    apiKey: 'AIzaSyDqEoih6hk3tIvqUpxsSS7CyAMhvTXWsRE', // ⚠️ AGREGAR TU API KEY DE GEMINI AQUÍ
+    apiKey: window.GEMINI_API_KEY || '',
     currentLanguage: 'en',
     isRecording: false,
     isSpeaking: false,
@@ -410,6 +410,11 @@ function initializeSpeechRecognition() {
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     
+    if ('webkitSpeechRecognition' in window) {
+    // Chrome-specific: intenta mantener sesión más tiempo
+    recognition.continuous = true;
+    }
+
     recognition.onresult = (event) => {
         let interimTranscript = '';
         let finalTranscript = '';
@@ -441,8 +446,19 @@ function initializeSpeechRecognition() {
     
     recognition.onend = () => {
         console.log('🛑 Recognition ended');
+        
         if (CONFIG.isRecording) {
-            recognition.start();
+            console.log('🔄 Auto-reconnecting...');
+            setTimeout(() => {
+                if (CONFIG.isRecording) {
+                    try {
+                        CONFIG.recognition.start();
+                        console.log('✅ Reconnected');
+                    } catch (e) {
+                        console.error('❌ Reconnection failed:', e);
+                    }
+                }
+            }, 100);
         }
     };
     
@@ -767,35 +783,28 @@ Be rigorous: Short responses = A1 or A2.`;
                     maxOutputTokens: 3500,
                     responseMimeType: "application/json",
                     responseSchema: {
-                        type: "object",
+                        type: "OBJECT",
                         properties: {
                             nivel: { 
-                                type: "string",
-                                description: "Only A1, A2, B1 or B2"
+                                type: "STRING"
                             },
                             complejidadLexica: { 
-                                type: "string",
-                                description: "Rating + description in 20 words"
+                                type: "STRING"
                             },
                             estructuraGramatical: { 
-                                type: "string",
-                                description: "Rating + description in 20 words"
+                                type: "STRING"
                             },
                             fluidez: { 
-                                type: "string",
-                                description: "Rating + description in 20 words"
+                                type: "STRING"
                             },
                             extension: { 
-                                type: "string",
-                                description: "Rating + description in 20 words"
+                                type: "STRING"
                             },
                             duracionCumplida: { 
-                                type: "string",
-                                description: "Comment about duration compliance"
+                                type: "STRING"
                             },
                             consejo: { 
-                                type: "string",
-                                description: "2 short sentences (30 words total)"
+                                type: "STRING"
                             }
                         },
                         required: ["nivel", "complejidadLexica", "estructuraGramatical", "fluidez", "extension", "duracionCumplida", "consejo"]
@@ -804,10 +813,32 @@ Be rigorous: Short responses = A1 or A2.`;
             })
         });
 
-        console.log('📥 Status:', response.status);
+        console.log('📥 Response status:', response.status);
 
         if (!response.ok) {
             console.error(`❌ HTTP ${response.status}`);
+            
+            // Leer respuesta de error
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                errorData = await response.text();
+            }
+            
+            console.error('═══════════════════════════════════════════');
+            console.error('📄 GEMINI ERROR DETAILS (FULL RESPONSE):');
+            console.error('═══════════════════════════════════════════');
+            console.error(typeof errorData === 'string' ? errorData : JSON.stringify(errorData, null, 2));
+            console.error('═══════════════════════════════════════════');
+            
+            // Mostrar error específico si existe
+            if (errorData && errorData.error) {
+                console.error('🔴 Error message:', errorData.error.message);
+                console.error('🔴 Error code:', errorData.error.code);
+                console.error('🔴 Error status:', errorData.error.status);
+            }
+            
             return null;
         }
 

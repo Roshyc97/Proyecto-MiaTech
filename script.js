@@ -52,7 +52,7 @@ const BROWSER = detectBrowser();
 
 // 1.3 - Mensajes del sistema
 const MESSAGES = {
-    greeting: "Hello {nombre}! I'm MiaTech", //it's a pleasure to have you here. I'll be your assistant and evaluator today.\n\nNow we'll begin the assessment. Please select one of the pictures below and complete the task according to the level.\n\nRemember to start with a personal introduction including your full name, age, city, profession, and hobbies, then describe the picture according to the instructions.\n\nGood luck!",
+    greeting: "Hello {nombre}! I'm MiaTech, it's a pleasure to have you here. I'll be your assistant and evaluator today.\n\nNow we'll begin the assessment. Please select one of the pictures below and complete the task according to the level.\n\nRemember to start with a personal introduction including your full name, age, city, profession, and hobbies, then describe the picture according to the instructions.\n\nGood luck!",
     confirmSelection: "Great choice, {nombre}! You selected Picture {num} (Level {level}).\n\nWhen you're ready, press the microphone button to start recording your response.",
     farewell: "Thank you for completing this assessment. Goodbye."
 };
@@ -771,7 +771,14 @@ Provide:
 
 ${datos.recordingDuration < (datos.minTime * 60) ? "NOTE: Student did not meet minimum duration." : ""}
 
-Be rigorous: Short responses = A1 or A2.`;
+EVALUATION APPROACH:
+- Consider these are BEGINNER learners, not native speakers
+- A1: Very basic words, simple present, many errors
+- A2: Simple past/future, basic vocabulary, some mistakes acceptable
+- B1: Can describe experiences, connected speech, errors don't impede communication
+- B2: Fluent expression, wide vocabulary, few errors
+
+Be encouraging: Focus on what they CAN do, not just errors. Short responses are acceptable if content is relevant.`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.apiKey}`, {
             method: 'POST',

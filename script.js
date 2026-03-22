@@ -481,29 +481,53 @@ function speakText(text) {
     let voice = null;
     
     if (BROWSER === 'edge') {
-        voice = voices.find(v => v.name.includes('Microsoft Jenny'));
+        voice = voices.find(v => v.name.includes('Microsoft Jenny') || v.name.includes('Microsoft Zira'));
         if (voice) {
-            console.log('🎤 Voice: Microsoft Jenny (Edge)');
+            console.log('🎤 Voice: ' + voice.name + ' (Edge)');
         }
     }
     
     if (!voice && BROWSER === 'chrome') {
         voice = voices.find(v => 
-            v.name.includes('Google US English') || 
-            v.name.includes('Google English') ||
-            (v.lang.startsWith('en') && v.name.includes('Google'))
+            v.name.includes('Google US English Female') ||
+            v.name.includes('Google UK English Female') ||
+            v.name.includes('Google English Female') ||
+            (v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
         );
         if (voice) {
-            console.log('🎤 Voice: Google English (Chrome)');
+            console.log('🎤 Voice: ' + voice.name + ' (Chrome)');
         }
     }
     
+
+        // Prioridad 2: Voces femeninas comunes (Safari, otros)
+    if (!voice) {
+        voice = voices.find(v => 
+            v.name.includes('Samantha') ||
+            v.name.includes('Karen') ||
+            v.name.toLowerCase().includes('female')
+        );
+        if (voice) {
+            console.log('🎤 Voice: ' + voice.name + ' (Female)');
+        }
+    }
+    
+    // Prioridad 3: Cualquier voz en inglés de EE.UU.
+    if (!voice) {
+        voice = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
+        if (voice) {
+            console.log('🎤 Voice: ' + voice.name + ' (en-US)');
+        }
+    }
+    
+    // Prioridad 4: Cualquier voz en inglés
     if (!voice) {
         voice = voices.find(v => v.lang.startsWith('en'));
         if (voice) {
             console.log('🎤 Fallback voice:', voice.name);
         }
     }
+
     
     if (voice) {
         utterance.voice = voice;
@@ -742,43 +766,54 @@ async function generarCalificacionCompleta() {
         
         const prompt = `You are an expert English evaluator using the CEFR framework.
 
-STUDENT INFORMATION:
-- Name: ${datos.firstName} ${datos.lastName}
-- Major: ${datos.major}
-- Selected Picture: Picture ${datos.selectedPicture} (Level ${datos.selectedLevel})
-- Task: "${datos.pictureTask}"
-- Required Duration: ${datos.minTime}-${datos.maxTime} minutes
-- Actual Duration: ${Math.floor(datos.recordingDuration / 60)}:${(datos.recordingDuration % 60).toString().padStart(2, '0')} minutes
+        CRITICAL INSTRUCTION: Provide ALL your feedback, explanations, and comments in ENGLISH only. Do not use Spanish or any other language.
 
-STUDENT'S COMPLETE RESPONSE (Introduction + Image Description):
-"${datos.fullTranscription}"
+        STUDENT INFORMATION:
+        - Name: ${datos.firstName} ${datos.lastName}
+        - Major: ${datos.major}
+        - Selected Picture: Picture ${datos.selectedPicture} (Level ${datos.selectedLevel})
+        - Task: "${datos.pictureTask}"
+        - Required Duration: ${datos.minTime}-${datos.maxTime} minutes
+        - Actual Duration: ${Math.floor(datos.recordingDuration / 60)}:${(datos.recordingDuration % 60).toString().padStart(2, '0')} minutes
 
-EVALUATION CRITERIA:
-1. Personal Introduction (coherence, fluency, vocabulary)
-2. Image Description:
-   - Did they follow the task instructions?
-   - Is the language level appropriate for ${datos.selectedLevel}?
-   - Vocabulary range
-   - Grammatical structures
-   - Fluency and coherence
-   - Task completion
-3. Duration compliance (${Math.floor(datos.recordingDuration / 60)} min ${datos.recordingDuration % 60} sec vs ${datos.minTime}-${datos.maxTime} min required)
+        STUDENT'S COMPLETE RESPONSE (Introduction + Image Description):
+        "${datos.fullTranscription}"
 
-Provide:
-- Overall CEFR level (A1, A2, B1, B2)
-- Detailed feedback for each criterion
-- Specific suggestions for improvement
+        IMPORTANT: Provide ALL feedback in English, not Spanish.
 
-${datos.recordingDuration < (datos.minTime * 60) ? "NOTE: Student did not meet minimum duration." : ""}
+        EVALUATION CRITERIA:
+        1. Personal Introduction (coherence, fluency, vocabulary)
+        2. Image Description:
+        - Did they follow the task instructions?
+        - Is the language level appropriate for ${datos.selectedLevel}?
+        - Vocabulary range
+        - Grammatical structures
+        - Fluency and coherence
+        - Task completion
+        3. Duration compliance (${Math.floor(datos.recordingDuration / 60)} min ${datos.recordingDuration % 60} sec vs ${datos.minTime}-${datos.maxTime} min required)
 
-EVALUATION APPROACH:
-- Consider these are BEGINNER learners, not native speakers
-- A1: Very basic words, simple present, many errors
-- A2: Simple past/future, basic vocabulary, some mistakes acceptable
-- B1: Can describe experiences, connected speech, errors don't impede communication
-- B2: Fluent expression, wide vocabulary, few errors
+        Provide (ALL IN ENGLISH):
+        - Overall CEFR level (A1, A2, B1, B2)
+        - Detailed feedback for each criterion IN ENGLISH
+        - Specific suggestions for improvement IN ENGLISH
+        - Use simple, clear English that the student can understand
 
-Be encouraging: Focus on what they CAN do, not just errors. Short responses are acceptable if content is relevant.`;
+        ${datos.recordingDuration < (datos.minTime * 60) ? "NOTE: Student did not meet minimum duration." : ""}
+
+        EVALUATION APPROACH FOR BEGINNER LEARNERS:
+        - Remember: These are students LEARNING English, not native speakers
+        - A1 Level: Very basic words (hello, my name is), simple present tense only, many grammatical errors
+        - A2 Level: Can use simple past/future, basic everyday vocabulary, some mistakes are normal and acceptable
+        - B1 Level: Can describe experiences and events, connected speech, errors don't impede overall communication
+        - B2 Level: Fluent expression, wide vocabulary range, only occasional minor errors
+
+        IMPORTANT GUIDELINES:
+        - Focus on what the student CAN do, not just what they cannot
+        - Grammar mistakes are expected at A2-B1 levels - don't penalize too harshly
+        - Pronunciation issues are normal for learners - focus on comprehensibility
+        - Be encouraging while honest about their current level
+
+${datos.recordingDuration < (datos.minTime * 60) ? "NOTE: Student did not meet minimum duration, but evaluate the content they did provide." : ""}`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.apiKey}`, {
             method: 'POST',

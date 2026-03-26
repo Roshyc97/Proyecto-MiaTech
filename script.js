@@ -480,51 +480,53 @@ function speakText(text) {
     const voices = CONFIG.synthesis.getVoices();
     let voice = null;
     
-    if (BROWSER === 'edge') {
-        voice = voices.find(v => v.name.includes('Microsoft Jenny') || v.name.includes('Microsoft Zira'));
-        if (voice) {
-            console.log('🎤 Voice: ' + voice.name + ' (Edge)');
-        }
-    }
-    
-    if (!voice && BROWSER === 'chrome') {
-        voice = voices.find(v => 
-            v.name.includes('Google US English Female') ||
-            v.name.includes('Google UK English Female') ||
-            v.name.includes('Google English Female') ||
-            (v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
-        );
-        if (voice) {
-            console.log('🎤 Voice: ' + voice.name + ' (Chrome)');
-        }
+    // Prioridad 1: Voces femeninas específicas por navegador
+    voice = voices.find(v => 
+        v.name.includes('Microsoft Jenny') || 
+        v.name === 'Microsoft Jenny Online (Natural) - English (United States)'
+    );
+    if (voice) {
+        console.log('🎤 Voice: Microsoft Jenny (Neural)');
     }
     
 
-        // Prioridad 2: Voces femeninas comunes (Safari, otros)
+    // Prioridad 2: Microsoft Zira (buena alternativa femenina)
     if (!voice) {
         voice = voices.find(v => 
-            v.name.includes('Samantha') ||
-            v.name.includes('Karen') ||
-            v.name.toLowerCase().includes('female')
+            v.name.includes('Microsoft Zira') ||
+            v.name === 'Microsoft Zira - English (United States)'
         );
         if (voice) {
-            console.log('🎤 Voice: ' + voice.name + ' (Female)');
+            console.log('🎤 Voice: Microsoft Zira (Backup)');
         }
     }
     
-    // Prioridad 3: Cualquier voz en inglés de EE.UU.
+    // Prioridad 3: Otras voces femeninas en inglés
+    if (!voice) {
+        voice = voices.find(v => 
+            v.lang.startsWith('en') && 
+            (v.name.toLowerCase().includes('female') ||
+             v.name.includes('Samantha') ||
+             v.name.includes('Karen'))
+        );
+        if (voice) {
+            console.log('🎤 Voice: ' + voice.name + ' (Female fallback)');
+        }
+    }
+    
+    // Prioridad 4: Cualquier voz en inglés de EE.UU.
     if (!voice) {
         voice = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
         if (voice) {
-            console.log('🎤 Voice: ' + voice.name + ' (en-US)');
+            console.log('🎤 Voice: ' + voice.name + ' (en-US fallback)');
         }
     }
     
-    // Prioridad 4: Cualquier voz en inglés
+    // Prioridad 5: Cualquier voz en inglés
     if (!voice) {
         voice = voices.find(v => v.lang.startsWith('en'));
         if (voice) {
-            console.log('🎤 Fallback voice:', voice.name);
+            console.log('🎤 Voice: ' + voice.name + ' (Last fallback)');
         }
     }
 

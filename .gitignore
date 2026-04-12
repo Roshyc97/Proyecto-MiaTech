@@ -1,89 +1,53 @@
-# ===========================================
-# MiaTech Assessment - Git Ignore File
-# ===========================================
-
-# ==========================================
-# ARCHIVOS SENSIBLES (NO SUBIR NUNCA)
-# ==========================================
-.env
-.env.local
-.env.production
-.env.*.local
-*.key
-*.pem
-
-# ==========================================
-# NODE.JS
-# ==========================================
+# Dependencies
 node_modules/
-npm-debug.log
-yarn-error.log
-yarn-debug.log
 package-lock.json
 
-# ==========================================
-# SISTEMA OPERATIVO
-# ==========================================
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
+# Database
+db/
+*.db
+*.sqlite
+*.sqlite3
 
-# Linux
-*~
+# Cache
+cache/
+*.cache
 
-# ==========================================
-# EDITORES DE CÓDIGO
-# ==========================================
-# Visual Studio Code
-.vscode/
-*.code-workspace
-
-# JetBrains (WebStorm, IntelliJ)
-.idea/
-*.iml
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Vim
-*.swp
-*.swo
-*~
-
-# ==========================================
-# LOGS Y TEMPORALES
-# ==========================================
+# Logs
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pids/
-*.pid
-*.seed
-*.pid.lock
 
-# ==========================================
-# CARPETAS TEMPORALES
-# ==========================================
-temp/
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
 tmp/
+temp/
+*.tmp
+
+# Build outputs
 dist/
 build/
-.cache/
 
-# ==========================================
-# ARCHIVOS DE RESPALDO
-# ==========================================
-*.bak
-*.backup
-*.old
-*.orig
+# Test coverage
+coverage/
+.nyc_output/
